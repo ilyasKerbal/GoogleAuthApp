@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GoogleAuthApp</string>
+    <string name="sign_in_title">Log in to proceed</string>
+    <string name="sign_in_subtitle">You must sign in \nbefore using this app. </string>
+</resources>
