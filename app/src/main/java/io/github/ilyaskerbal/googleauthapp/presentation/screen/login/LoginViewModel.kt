@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.ilyaskerbal.googleauthapp.domain.exception.GoogleAccountNotFoundException
 import io.github.ilyaskerbal.googleauthapp.domain.model.MessageBarState
 import io.github.ilyaskerbal.googleauthapp.domain.repository.Repository
 import kotlinx.coroutines.Dispatchers
@@ -36,9 +37,11 @@ class LoginViewModel @Inject constructor (
     fun saveSignedInstate(signedInSate: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.saveSignedInState(signedInSate)
-            delay(5000)
-            repository.saveSignedInState(false)
         }
+    }
+
+    fun updateMessageBarState() {
+        _messageBarState.value = MessageBarState(error = GoogleAccountNotFoundException())
     }
 
 }

@@ -1,9 +1,18 @@
 package io.github.ilyaskerbal.googleauthapp.presentation.screen.common
 
 import android.app.Activity
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
 import io.github.ilyaskerbal.googleauthapp.utils.Constants
 
 fun signIn(
@@ -75,4 +84,40 @@ fun signUp(
         .addOnFailureListener {
             accountNotFound()
         }
+}
+
+@Composable
+fun StartActivityForResult(
+    key: Any,
+    onResultReceived: (String) -> Unit,
+    onDialogDismissed: () -> Unit,
+    launcher: (ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>) -> Unit
+) {
+    val activity = LocalContext.current as Activity
+    val activityLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) { activityResult ->
+        try {
+            if (activityResult.resultCode == Activity.RESULT_OK) {
+                val oneTapClient = Identity.getSignInClient(activity)
+                val credentials = oneTapClient.getSignInCredentialFromIntent(activityResult.data)
+                val googleTokenId = credentials.googleIdToken
+                googleTokenId?.let {
+                    onResultReceived(it)
+                }
+            } else {
+                onDialogDismissed()
+            }
+        } catch (e: ApiException) {
+            when(e.statusCode) {
+                CommonStatusCodes.CANCELED -> onDialogDismissed()
+                CommonStatusCodes.NETWORK_ERROR -> onDialogDismissed()
+                else -> onDialogDismissed()
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = key) {
+        launcher(activityLauncher)
+    }
 }

@@ -43,11 +43,11 @@ fun MessageBar(
             errorMessage = when(it) {
                 is ConnectException -> "Internet connection unavailable"
                 is SocketTimeoutException -> "Connection timeout exception"
-                else -> "Oops! Something went wrong try again."
+                else -> "Oops! ${it.message}"
             }
         }
         startAnimation = true
-        delay(300L)
+        delay(4000L)
         startAnimation = false
     }
 
