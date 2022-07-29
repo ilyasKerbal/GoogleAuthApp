@@ -67,7 +67,7 @@ fun MessageBar(
 }
 
 @Composable
-fun MessageRow(messageBarState: MessageBarState, errorMessage: String) {
+private fun MessageRow(messageBarState: MessageBarState, errorMessage: String) {
     val isError = messageBarState.error != null
     val barColor = if (isError) ErrorRed else InfoGreen
     val barIcon = if (isError) Icons.Default.Warning else Icons.Default.Check

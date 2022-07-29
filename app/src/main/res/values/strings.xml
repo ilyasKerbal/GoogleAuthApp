@@ -5,4 +5,5 @@
     <string name="please_wait">Please wait…</string>
     <string name="primary_text_google">Sign in with Google</string>
     <string name="google_btn_content_description">Sign in with Google</string>
+    <string name="sign_in">Sign in</string>
 </resources>
