@@ -40,6 +40,7 @@ fun LoginScreen(
         key = signedInState,
         onResultReceived = { tokenID ->
             // https://oauth2.googleapis.com/tokeninfo?id_token=##
+            Log.i("P/SOME", tokenID)
         },
         onDialogDismissed = {
             loginViewModel.saveSignedInstate(false)
