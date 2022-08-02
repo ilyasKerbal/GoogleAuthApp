@@ -16,6 +16,7 @@ import io.github.ilyaskerbal.googleauthapp.navigation.Screen
 import io.github.ilyaskerbal.googleauthapp.presentation.screen.common.StartActivityForResult
 import io.github.ilyaskerbal.googleauthapp.presentation.screen.common.signIn
 import io.github.ilyaskerbal.googleauthapp.utils.RequestState
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
@@ -76,6 +77,7 @@ fun LoginScreen(
             is RequestState.Success -> {
                 val response = (apiResponse as RequestState.Success<ApiResponse>).data.success
                 if (response) {
+                    delay(2000L)
                     navigateToProfileScreen(navController = navController)
                 }  else {
                     loginViewModel.saveSignedInstate(false)

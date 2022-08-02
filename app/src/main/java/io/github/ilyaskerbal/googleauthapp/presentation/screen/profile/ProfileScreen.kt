@@ -1,5 +1,6 @@
 package io.github.ilyaskerbal.googleauthapp.presentation.screen.profile
 
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 
@@ -7,5 +8,15 @@ import androidx.navigation.NavHostController
 fun ProfileScreen(
     navController: NavHostController
 ) {
+    Scaffold(
+        topBar = {
+            ProfileTopBar(
+                onSave = {},
+                onDeleteAll = {}
+            )
+        },
+        content = {
 
+        }
+    )
 }
