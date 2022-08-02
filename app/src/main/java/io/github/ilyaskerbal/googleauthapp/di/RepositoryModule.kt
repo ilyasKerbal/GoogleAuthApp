@@ -10,6 +10,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.github.ilyaskerbal.googleauthapp.data.remote.KtorApi
 import io.github.ilyaskerbal.googleauthapp.data.repository.DataStoreOperationsImpl
 import io.github.ilyaskerbal.googleauthapp.data.repository.RepositoryImpl
 import io.github.ilyaskerbal.googleauthapp.domain.repository.DataStoreOperations
@@ -44,8 +45,9 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideRepository(
-        dataStoreOperations: DataStoreOperations
+        dataStoreOperations: DataStoreOperations,
+        ktorApi: KtorApi
     ) : Repository {
-        return RepositoryImpl(dataStoreOperations = dataStoreOperations)
+        return RepositoryImpl(dataStoreOperations = dataStoreOperations, ktorApi = ktorApi)
     }
 }
