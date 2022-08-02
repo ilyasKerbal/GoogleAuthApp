@@ -31,8 +31,8 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(cookieManager: CookieManager) : OkHttpClient {
         return OkHttpClient.Builder()
-            .connectTimeout(15L, TimeUnit.SECONDS)
-            .readTimeout(15L, TimeUnit.SECONDS)
+            .connectTimeout(10L, TimeUnit.SECONDS)
+            .readTimeout(10L, TimeUnit.SECONDS)
             .cookieJar(JavaNetCookieJar(cookieManager))
             .build()
     }

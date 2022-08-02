@@ -4,13 +4,18 @@ import android.app.Activity
 import android.util.Log
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import io.github.ilyaskerbal.googleauthapp.domain.model.ApiRequest
+import io.github.ilyaskerbal.googleauthapp.domain.model.ApiResponse
 import io.github.ilyaskerbal.googleauthapp.domain.model.MessageBarState
+import io.github.ilyaskerbal.googleauthapp.navigation.Screen
 import io.github.ilyaskerbal.googleauthapp.presentation.screen.common.StartActivityForResult
 import io.github.ilyaskerbal.googleauthapp.presentation.screen.common.signIn
+import io.github.ilyaskerbal.googleauthapp.utils.RequestState
 
 @Composable
 fun LoginScreen(
@@ -20,6 +25,7 @@ fun LoginScreen(
 
     val signedInState by loginViewModel.signedInSate
     val messageBarState by loginViewModel.messageBarState
+    val apiResponse by loginViewModel.apiResponse
 
     Scaffold(
         topBar = { LoginTopBar() },
@@ -41,6 +47,11 @@ fun LoginScreen(
         onResultReceived = { tokenID ->
             // https://oauth2.googleapis.com/tokeninfo?id_token=##
             Log.i("P/SOME", tokenID)
+            loginViewModel.verifyTokenOnBackend(
+                request = ApiRequest(
+                    tokenId = tokenID
+                )
+            )
         },
         onDialogDismissed = {
             loginViewModel.saveSignedInstate(false)
@@ -57,6 +68,30 @@ fun LoginScreen(
                     loginViewModel.updateMessageBarState()
                 }
             )
+        }
+    }
+
+    LaunchedEffect(key1 = apiResponse) {
+        when(apiResponse) {
+            is RequestState.Success -> {
+                val response = (apiResponse as RequestState.Success<ApiResponse>).data.success
+                if (response) {
+                    navigateToProfileScreen(navController = navController)
+                }  else {
+                    loginViewModel.saveSignedInstate(false)
+                }
+            }
+            else -> {}
+        }
+    }
+}
+
+private fun navigateToProfileScreen(
+    navController: NavHostController
+) {
+    navController.navigate(Screen.Profile.route) {
+        popUpTo(route = Screen.Login.route) {
+            inclusive = true
         }
     }
 }
