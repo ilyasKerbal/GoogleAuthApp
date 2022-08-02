@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import io.github.ilyaskerbal.googleauthapp.presentation.screen.login.LoginScreen
+import io.github.ilyaskerbal.googleauthapp.presentation.screen.profile.ProfileScreen
 
 @Composable
 fun SetupNavGraph(
@@ -19,7 +20,7 @@ fun SetupNavGraph(
         }
 
         composable(route = Screen.Profile.route) {
-
+            ProfileScreen(navController = navController)
         }
     }
 }
