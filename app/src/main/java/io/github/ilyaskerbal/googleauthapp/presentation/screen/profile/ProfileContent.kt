@@ -33,8 +33,8 @@ fun ProfileContent(
     onFirstNameChanged: (String) -> Unit,
     lastName: String,
     onLastNameChanged: (String) -> Unit,
-    emailAddress: String,
-    profilePicture: String,
+    emailAddress: String?,
+    profilePicture: String?,
     onSignOutClicked: () -> Unit
 ) {
     Column(
