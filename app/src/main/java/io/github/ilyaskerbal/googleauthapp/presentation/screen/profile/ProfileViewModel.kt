@@ -14,6 +14,7 @@ import io.github.ilyaskerbal.googleauthapp.domain.repository.Repository
 import io.github.ilyaskerbal.googleauthapp.utils.RequestState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,6 +37,10 @@ class ProfileViewModel @Inject constructor(
     private val _messageBarState: MutableState<MessageBarState> = mutableStateOf(MessageBarState())
     val messageBarState: State<MessageBarState> = _messageBarState
 
+    private val _clearSessionResponse: MutableState<RequestState<ApiResponse>> =
+        mutableStateOf(RequestState.Idle)
+    val clearSessionResponse: State<RequestState<ApiResponse>> = _clearSessionResponse
+
     init {
         getUserInfo()
     }
@@ -44,7 +49,9 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _apiResponse.value = RequestState.Loading
             try {
-                val response = repository.getUserInfo()
+                val response = withContext(Dispatchers.IO) {
+                    repository.getUserInfo()
+                }
                 _apiResponse.value = RequestState.Success(response)
                 _messageBarState.value = MessageBarState(
                     message = response.message,
@@ -126,6 +133,32 @@ class ProfileViewModel @Inject constructor(
                 )
                 _messageBarState.value = MessageBarState(error = exception)
             }
+        }
+    }
+
+    fun clearSession() {
+        _clearSessionResponse.value = RequestState.Loading
+        _apiResponse.value = RequestState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = repository.signOut()
+                _clearSessionResponse.value = RequestState.Success(response)
+                _apiResponse.value = RequestState.Success(response)
+                _messageBarState.value = MessageBarState(
+                    message = response.message,
+                    error = response.error
+                )
+            } catch (e: Exception) {
+                _clearSessionResponse.value = RequestState.Error(e)
+                _apiResponse.value = RequestState.Error(e)
+                _messageBarState.value = MessageBarState(error = e)
+            }
+        }
+    }
+
+    fun saveSignedInState(signedIn: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.saveSignedInState(signedIn = signedIn)
         }
     }
 
