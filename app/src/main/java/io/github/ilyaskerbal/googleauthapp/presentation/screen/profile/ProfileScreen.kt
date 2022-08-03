@@ -9,10 +9,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.android.gms.auth.api.identity.Identity
+import io.github.ilyaskerbal.googleauthapp.domain.model.ApiRequest
 import io.github.ilyaskerbal.googleauthapp.domain.model.ApiResponse
 import io.github.ilyaskerbal.googleauthapp.domain.model.MessageBarState
 import io.github.ilyaskerbal.googleauthapp.navigation.Screen
+import io.github.ilyaskerbal.googleauthapp.presentation.screen.common.StartActivityForResult
+import io.github.ilyaskerbal.googleauthapp.presentation.screen.common.signIn
 import io.github.ilyaskerbal.googleauthapp.utils.RequestState
+import retrofit2.HttpException
 
 @Composable
 fun ProfileScreen(
@@ -61,6 +65,38 @@ fun ProfileScreen(
     )
 
     val activity = LocalContext.current as Activity
+
+    StartActivityForResult(
+        key = apiResponse,
+        onResultReceived = { tokenId ->
+            viewModel.verifyTokenOnBackend(
+                request = ApiRequest(tokenId = tokenId)
+            )
+        },
+        onDialogDismissed = {
+            viewModel.saveSignedInState(signedIn = false)
+            navigateToLoginScreen(navController = navController)
+        }
+    ) { activityLauncher ->
+        if (apiResponse is RequestState.Success) {
+            val response = (apiResponse as RequestState.Success<ApiResponse>).data
+            if (response.error is HttpException && response.error.code() == 401) {
+                signIn(
+                    activity = activity,
+                    accountNotFound = {
+                        viewModel.saveSignedInState(signedIn = false)
+                        navigateToLoginScreen(navController = navController)
+                    },
+                    launchActivityResult = {
+                        activityLauncher.launch(it)
+                    }
+                )
+            }
+        } else if (apiResponse is RequestState.Error) {
+            viewModel.saveSignedInState(signedIn = false)
+            navigateToLoginScreen(navController = navController)
+        }
+    }
 
     LaunchedEffect(key1 = clearSessionResponse) {
         if (clearSessionResponse is RequestState.Success &&
