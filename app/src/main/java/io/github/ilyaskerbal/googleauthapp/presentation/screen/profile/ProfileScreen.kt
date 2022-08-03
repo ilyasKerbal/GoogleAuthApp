@@ -34,7 +34,9 @@ fun ProfileScreen(
                 onSave = {
                          viewModel.updateUserInfo()
                 },
-                onDeleteAll = {}
+                onDeleteAll = {
+                    viewModel.deleteUser()
+                }
             )
         },
         content = {
